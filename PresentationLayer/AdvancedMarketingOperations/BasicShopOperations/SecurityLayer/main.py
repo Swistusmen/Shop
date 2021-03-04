@@ -16,6 +16,8 @@ models.Base.metadata.create_all(bind=database.engine)
 
 app=FastAPI()
 
+oauth2_scheme= OAuth2PasswordBearer(tokenUrl="token")
+
 def get_db():
     db=database.SessionLocal()
     try:
@@ -71,3 +73,8 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+#i have it there just to have an option to autorize using swagger UI
+@app.get("/nothing/")
+async def nothing(token: str = Depends(oauth2_scheme)):
+    pass
