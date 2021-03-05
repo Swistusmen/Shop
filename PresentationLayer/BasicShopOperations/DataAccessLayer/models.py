@@ -11,8 +11,9 @@ class User(Base):
     surname= Column(String, index=True)
     email= Column(String, unique=True, index=True) #username
     wallet= Column(Float, index=True)
-    #I've added this
     password=Column(String,index=True)
+    is_admin=Column(Boolean, index=True)
+    is_disabled=Column(Boolean, index=True)
 
     user= relationship("Product", back_populates="products")
     owner= relationship("Order", back_populates="orders")

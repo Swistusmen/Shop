@@ -27,7 +27,12 @@ class UserBase(BaseModel):
     name: str
     surname: str
     email: str
+    is_disabled: bool
+    
+class UserCreate(UserBase):
     password: str
+    is_admin: bool
+  
 
 class User(UserBase):
     id: int

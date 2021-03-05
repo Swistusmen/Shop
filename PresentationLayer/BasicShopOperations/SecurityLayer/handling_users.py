@@ -5,7 +5,7 @@ from DataAccessLayer.models import User as mUser
 from DataAccessLayer.schemas import User as User
 from DataAccessLayer import crud
 
-import handling_passwords
+from . import handling_passwords
 
 oauth2_scheme= OAuth2PasswordBearer(tokenUrl="token")
 

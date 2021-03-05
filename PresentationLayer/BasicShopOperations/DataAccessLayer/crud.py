@@ -1,11 +1,8 @@
 from sqlalchemy.orm import Session
-from .schemas import User, Product, Order
+from .schemas import User, Product, Order, UserCreate
 from .models import User as mUser
 from .models import Product as mProduct
 from .models import Order as mOrder
-#import .schemas
-#import .models
-
 
 def get_user(db: Session, user_id:int):
     return db.query(mUser).filter(mUser.id==user_id).first()
@@ -34,8 +31,16 @@ def get_all_products(db:Session):
 def get_orders_by_user(db: Session, owner_id: int):
     return db.query(mOrder).filter(mOrder.user_id==owner_id).all()
 
-def create_user(db: Session, user: User):
-    db_user=mUser(name=user.name, email=user.email, surname=user.surname, wallet=0.0,password=user.password)
+def get_basket(db:Session, user_id: int):
+    orders=db.query(mOrder).filter(mOrder.user_id==user_id).all()
+    for i in orders:
+        if i.isFinished== False:
+            return i
+    return False
+
+#change here
+def create_user(db: Session, user: UserCreate):
+    db_user=mUser(name=user.name, email=user.email, surname=user.surname, wallet=0.0,password=user.password, is_admin=user.is_admin,is_disabled=True)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -78,4 +83,24 @@ def change_state_of_order(db: Session, order: mOrder, state: bool):
     db.commit()
     db.refresh(order)
     return product
+
+def switch_user_activity(db:Session, user_id:int):
+    user=db.query(mUser).filter(mUser.id==user_id).first()
+    db.query(mUser).filter(mUser.id==user_id).delete()
+    user.is_disabled= not user.is_disabled
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+def update_wallet(db:Session, user_id: int, new_wallet:float):
+    user=db.query(mUser).filter(mUser.id==user_id).first()
+    db.query(mUser).filter(mUser.id==user_id).delete()
+    user.wallet= not user.new_wallet
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
 
