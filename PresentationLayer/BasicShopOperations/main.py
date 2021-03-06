@@ -1,9 +1,11 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Response, Cookie
+from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.requests import Request
 from DataAccessLayer import crud, models, schemas, database
 
 
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 
 from SecurityLayer import handling_passwords as hp
@@ -15,9 +17,13 @@ from datetime import timedelta, datetime
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
+from starlette.requests import Request
+from starlette.responses import Response
+
 models.Base.metadata.create_all(bind=database.engine)
 
 app=FastAPI()
+
 
 oauth2_scheme= OAuth2PasswordBearer(tokenUrl="token")
 
@@ -79,12 +85,23 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     
     return {"access_token": access_token, "token_type": "bearer"}
 
-#i have it there just to have an option to autorize using swagger UI
+#thanks to this i can make some operations only when i'm authenticted
 @app.get("/nothing/")
 async def nothing(token: str = Depends(oauth2_scheme)):
     pass
+#set up the cookie
+@app.post("/cookie/")
+def add_product_to_local_basket(response: Response):
+    content={"message":"I am your cookie"}
+    response.set_cookie(key="fakesession_4", value="my first cookie")
+    return {"message":"I've set up my first cookie"}
 
-@app.get("/check_if_connected/")
-def do_nothing():
+#read cookie from the front end
+@app.get ("/hello/")
+async def app_t(request: Request):
+    #request.cookies // is a dictionary of cookies
+    g=request.cookies.get("fakesession_4")
+    return g
     
-    return {"nic": "nie robie"}
+
+
