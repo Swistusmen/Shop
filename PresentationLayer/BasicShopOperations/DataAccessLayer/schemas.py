@@ -28,6 +28,7 @@ class UserBase(BaseModel):
     surname: str
     email: str
     is_disabled: bool
+    wallet: float
     
 class UserCreate(UserBase):
     password: str

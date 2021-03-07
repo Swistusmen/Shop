@@ -95,9 +95,10 @@ def switch_user_activity(db:Session, user_id:int):
 
 def update_wallet(db:Session, user_id: int, new_wallet:float):
     user=db.query(mUser).filter(mUser.id==user_id).first()
-    db.query(mUser).filter(mUser.id==user_id).delete()
-    user.wallet= not user.new_wallet
-    db.add(user)
+    #db.query(mUser).filter(mUser.id==user_id).delete()
+    #db.commit()
+    user.wallet= new_wallet
+    #db.add(user)
     db.commit()
     db.refresh(user)
     return user

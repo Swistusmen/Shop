@@ -20,6 +20,10 @@ from passlib.context import CryptContext
 from starlette.requests import Request
 from starlette.responses import Response
 
+import json
+
+from ClientOperations.client_operations import add_credits_to_the_wallet
+
 models.Base.metadata.create_all(bind=database.engine)
 
 app=FastAPI()
@@ -102,6 +106,64 @@ async def app_t(request: Request):
     #request.cookies // is a dictionary of cookies
     g=request.cookies.get("fakesession_4")
     return g
+
+@app.post("/product/{product_id}")
+async def add_product_to_the_basket(response: Response, request: Request,product_id:int, db: Session=Depends(get_db)):
+    bucket=request.cookies.get("bucket")
+    if bucket is None:
+        new_item={}
+        new_item[product_id]=1
+        response.set_cookie(key="bucket", value=new_item)
+    else:
+        bucket=transform_string_to_dictionary(bucket)
+        if product_id in bucket.keys():
+            bucket[product_id]+=1
+        else:
+            bucket[product_id]=1
+        #print(bucket)
+        response.set_cookie(key="bucket", value=bucket)
+
+@app.post("/product/bucket/{product_id}")
+async def remove_product_to_the_basket(response: Response, request: Request,product_id:int, db: Session=Depends(get_db)):
+    bucket=request.cookies.get("bucket")
+    if bucket is None:
+        pass
+    bucket=transform_string_to_dictionary(bucket)
+    if product_id in bucket.keys():
+        bucket[product_id]-=1
+        if bucket[product_id]==0:
+            bucket.pop(product_id)
+        #print(bucket)
+        response.set_cookie(key="bucket", value=bucket)
+
+@app.post("/account/wallet/")
+async def add_money_to_account(income:float, user_id:int,db:Session=Depends(get_db),token:str=Depends(oauth2_scheme)):
+    add_credits_to_the_wallet(db,user_id,income)
+    my_user=crud.get_user(db,user_id)
+    print(my_user.wallet)
+
+def transform_string_to_dictionary(cookie:str):
+    cookie=cookie[:-1]
+    cookie=cookie[1:]
+    new_dictionary=cookie.split(",")
+    my_dict={}
+    for i in new_dictionary:
+        a=i.split(":")
+        a[0]=int(a[0])
+        a[1]=int(a[1])
+        my_dict[a[0]]=a[1]
+    return my_dict
+
+#TODO- add function which return current user after login
+#TODO- create function for payment
+#TODO- better locations of every endpoinr
+#TODO- add pagination
+#TODO- add advisory basing on other purchases
+# backend over
+#TODO- add frontend
+
+        
+
     
 
 
