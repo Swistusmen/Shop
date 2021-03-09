@@ -17,7 +17,7 @@ class OrderBase(BaseModel):
     isFinished: bool
     products: str
 
-class Order(BaseModel):
+class Order(OrderBase):
     owner_id: int
 
     class Config:
@@ -33,7 +33,9 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str
     is_admin: bool
-  
+
+    class Config:
+        orm_mode=True
 
 class User(UserBase):
     id: int

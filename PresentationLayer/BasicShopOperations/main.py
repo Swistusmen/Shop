@@ -22,7 +22,7 @@ from starlette.responses import Response
 
 import json
 
-from ClientOperations.client_operations import add_credits_to_the_wallet
+from ClientOperations.client_operations import add_credits_to_the_wallet, realese_order
 
 models.Base.metadata.create_all(bind=database.engine)
 
@@ -46,24 +46,15 @@ def get_user(email: str, password: str, db: Session=Depends(get_db)):
 def create_user(user: schemas.UserCreate, db: Session= Depends(get_db)):
     user=hs.register_new_user(user)
     return crud.create_user(db=db, user=user)
-
-@app.post("/admin/products/", response_model=schemas.Product)
-def create_product(product: schemas.Product, db:Session=Depends(get_db)):
-    return crud.create_product(db=db,product=product,shop_id=1)
-
+'''
 @app.get("/users/{user_id}", response_model=schemas.User)
 def get_user_by_id(user_id: int, db: Session= Depends(get_db)):
     db_user= crud.get_user(db, user_id= user_id)
     return db_user
-
+'''
 @app.get("/products/", response_model=List[schemas.Product])
 def get_all_products(db:Session= Depends(get_db)):
     return crud.get_all_products(db)
-
-@app.get("/admin/users/", response_model=List[schemas.User])
-def get_all_users(db:Session=Depends(get_db)):
-    db_users=crud.get_users(db)
-    return db_users
 
 @app.post("/token", response_model=hp.Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session=Depends(get_db)):
@@ -88,24 +79,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     
     return {"access_token": access_token, "token_type": "bearer"}
-
-#thanks to this i can make some operations only when i'm authenticted
-@app.get("/nothing/")
-async def nothing(token: str = Depends(oauth2_scheme)):
-    pass
-#set up the cookie
-@app.post("/cookie/")
-def add_product_to_local_basket(response: Response):
-    content={"message":"I am your cookie"}
-    response.set_cookie(key="fakesession_4", value="my first cookie")
-    return {"message":"I've set up my first cookie"}
-
-#read cookie from the front end
-@app.get ("/hello/")
-async def app_t(request: Request):
-    #request.cookies // is a dictionary of cookies
-    g=request.cookies.get("fakesession_4")
-    return g
 
 @app.post("/product/{product_id}")
 async def add_product_to_the_basket(response: Response, request: Request,product_id:int, db: Session=Depends(get_db)):
@@ -133,13 +106,12 @@ async def remove_product_to_the_basket(response: Response, request: Request,prod
         bucket[product_id]-=1
         if bucket[product_id]==0:
             bucket.pop(product_id)
-        #print(bucket)
         response.set_cookie(key="bucket", value=bucket)
 
 @app.post("/account/wallet/")
-async def add_money_to_account(income:float, user_id:int,db:Session=Depends(get_db),token:str=Depends(oauth2_scheme)):
-    add_credits_to_the_wallet(db,user_id,income)
-    my_user=crud.get_user(db,user_id)
+async def add_money_to_account(income:float,db:Session=Depends(get_db), current_user: schemas.User=Depends(hs.get_current_user)):
+    add_credits_to_the_wallet(db,current_user.id,income)
+    my_user=crud.get_user(db,current_user.id)
     print(my_user.wallet)
 
 def transform_string_to_dictionary(cookie:str):
@@ -153,12 +125,67 @@ def transform_string_to_dictionary(cookie:str):
         a[1]=int(a[1])
         my_dict[a[0]]=a[1]
     return my_dict
+'''
+@app.get("/users/me/", response_model=schemas.User)
+async def get_me(current_user: schemas.User=Depends(hs.get_current_user)):
+    return current_user
+'''
+@app.post("/bucket/payment/")
+async def make_a_payment(response: Response,request: Request,db:Session=Depends(get_db),current_user: schemas.User=Depends(hs.get_current_user)):
+    cookie=request.cookies.get("bucket")
+    cookie=transform_string_to_dictionary(cookie)
+    realese_order(db, current_user.id,cookie,1)
+    response.set_cookie(key="bucket", value="")
 
-#TODO- add function which return current user after login
-#TODO- create function for payment
-#TODO- better locations of every endpoinr
+@app.post("/admin/accounts/modify/{user_id}/is_administrator")
+async def change_account_admin_settings(user_id:int,admin_priviliges: bool,db:Session=Depends(get_db),current_user: schemas.User=Depends(hs.get_current_user)):
+    if current_user.is_admin==True:
+        print(admin_priviliges)
+        user=crud.update_admin(db,user_id,admin_priviliges)
+
+@app.get("/admin/users/", response_model=List[schemas.UserCreate])
+def get_all_users(db:Session=Depends(get_db),current_user: schemas.UserCreate=Depends(hs.get_current_user_admin)):
+    if current_user.is_admin==True:
+        db_users=crud.get_users(db)
+        return db_users
+
+@app.post("/admin/products/", response_model=schemas.Product)
+def create_product(product: schemas.Product, db:Session=Depends(get_db),current_user: schemas.UserCreate=Depends(hs.get_current_user_admin)):
+    if current_user.is_admin==True:
+        return crud.create_product(db=db,product=product,shop_id=1)
+
+@app.post("/admin/products/change_number", response_model=schemas.Product)
+def create_product(product_id: int, number:int,db:Session=Depends(get_db),current_user: schemas.UserCreate=Depends(hs.get_current_user_admin)):
+    if current_user.is_admin==True:
+        product=crud.get_product(db,product_id)
+        if product is None:
+            return None
+        return crud.change_number_of_product(db, product,number)
+
+@app.post("/admin/products/change_price", response_model=schemas.Product)
+def create_product(product_id: int, price:float,db:Session=Depends(get_db),current_user: schemas.UserCreate=Depends(hs.get_current_user_admin)):
+    if current_user.is_admin==True:
+        product=crud.get_product(db,product_id)
+        if product is None:
+            return None
+        return crud.change_price_of_product(db, product,price)
+
+#TODO- add function which return current user after login -#DONE
+#TODO- create function for payment #DONE
+#TODO- admin module DONE
+#- change prive DONE
+#- change number of product DONE
+#- authenticate if it is admin DONE
+#- add product DONE
+#TODO- better locations of every endpoint #DONE
 #TODO- add pagination
+#- all products
+#- a few products
 #TODO- add advisory basing on other purchases
+#TODO- story of purchases
+#- get stroy of purchases
+#- parse it to the proper form
+#- process it
 # backend over
 #TODO- add frontend
 

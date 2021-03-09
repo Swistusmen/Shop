@@ -16,6 +16,9 @@ class Token(BaseModel):
     token_type: str
     access_token: str
 
+class TokenData(BaseModel):
+    username: Optional[str] = None
+
 def hash_password(password):
     return pwd_context.hash(password)
 

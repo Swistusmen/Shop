@@ -1,5 +1,5 @@
 from DataAccessLayer.models import User as mUser
-from DataAccessLayer.schemas import User as User
+from DataAccessLayer.schemas import User as User, Order
 from DataAccessLayer import crud
 
 import json
@@ -33,7 +33,7 @@ def substract_credits_from_the_wallet(database, user_id:int, amount_of_money:flo
     return crud.update_wallet(database,user_id,new_value)
 
 def create_and_save_order(database, user_id:int, cookie:dict):
-    bucket=schemas.Order(isFinished=True, products=json.dumps(cookie),owner_id=user_id)
+    bucket=Order(isFinished=True, products=json.dumps(cookie),owner_id=user_id)
     return crud.create_order(database,bucket)
     
 def decrease_number_of_product_in_shop(database, product_id: int, substract_this_number:int):
@@ -46,7 +46,9 @@ def take_money_from_client_to_the_shop(database, client_id:int, shop_id:int, mon
         add_credits_to_the_wallet(database,shop_id,money)
 
 def check_product_availability(database, cookie_product:tuple):
+    print(type(cookie_product))
     product=crud.get_product(database,cookie_product[0])
+    print(type(product))
     return [cookie_product[0],product.number-cookie_product[1], cookie_product[1]*product.price]
 
 def check_user_wallet(database, user_id:int, money:float):
@@ -55,9 +57,9 @@ def check_user_wallet(database, user_id:int, money:float):
 
 def realese_order(database, user_id:int, cookie: dict,shop_id:int):
     total_price=0.0
-    for i in cookie:
+    for i in cookie.items():
         result=check_product_availability(database, i)
-        if result[1]<0:
+        if (int)(result[1])<0:
             return result
         total_price+=result[2]
     money_in_user_waller_after_buying=check_user_wallet(database,user_id,total_price)
@@ -65,7 +67,7 @@ def realese_order(database, user_id:int, cookie: dict,shop_id:int):
         return money_in_user_waller_after_buying
     take_money_from_client_to_the_shop(database,user_id,shop_id, total_price)
     for i in cookie.items():
-        decrease_number_of_product_in_shop(database,cookie[0],cookie[1])
+        decrease_number_of_product_in_shop(database,i[0],i[1])
     create_and_save_order(database,user_id,cookie)
     
     
