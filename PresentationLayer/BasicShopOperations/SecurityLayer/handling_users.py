@@ -49,25 +49,6 @@ async def get_current_user(db:Session=Depends(get_db), token: str = Depends(oaut
         raise credentials_exception
     return user
 
-async def get_current_user_admin(db:Session=Depends(get_db), token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=401,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, hp.SECRET_KEY, algorithms=[hp.ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-        token_data = hp.TokenData(username=username)
-    except JWTError:
-        raise credentials_exception
-    user = crud.get_user_by_mail_admin( db,user_email=token_data.username)
-    if user is None:
-        raise credentials_exception
-    return user
-
 def register_new_user(user):
     user.password= hp.hash_password(user.password)
     print(user.password)

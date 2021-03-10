@@ -7,16 +7,10 @@ from .models import Order as mOrder
 def get_user(db: Session, user_id:int):
     return db.query(mUser).filter(mUser.id==user_id).first()
 
-def get_user_create(db:Session, user_id:int):
-    return db.query(mUser).filter(mUser.id==user_id).first()
-
 def get_users(db:Session):
     return db.query(mUser).all()
 
 def get_user_by_mail(db: Session, user_email: str):
-    return db.query(mUser).filter(mUser.email==user_email).first()
-
-def get_user_by_mail_admin(db: Session, user_email: str):
     return db.query(mUser).filter(mUser.email==user_email).first()
 
 def get_users_by_name(db: Session, user_name: str):
@@ -44,7 +38,6 @@ def get_basket(db:Session, user_id: int):
             return i
     return False
 
-#change here
 def create_user(db: Session, user: UserCreate):
     db_user=mUser(name=user.name, email=user.email, surname=user.surname, wallet=0.0,password=user.password, is_admin=False,is_disabled=True)
     db.add(db_user)
@@ -68,16 +61,12 @@ def create_order(db: Session, order: Order):
 
 def change_number_of_product(db: Session, product: mProduct, number: int):
     product.number=number
-    #db.query(mProduct).filter(mProduct.id==product.id).delete()
-    #db.add(product)
     db.commit()
     db.refresh(product)
     return product
 
 def change_price_of_product(db: Session, product: mProduct, price: float):
     product.price=price
-    #db.query(mProduct).filter(mProduct.id==product.id).delete()
-    #db.add(product)
     db.commit()
     db.refresh(product)
     return product
@@ -88,7 +77,6 @@ def change_state_of_order(db: Session, order: mOrder, state: bool):
     db.add(order)
     db.commit()
     db.refresh(order)
-    return product
 
 def switch_user_activity(db:Session, user_id:int):
     user=db.query(mUser).filter(mUser.id==user_id).first()
