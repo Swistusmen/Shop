@@ -2,7 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-SQLALCHEMY_DATABASE_URL="sqlite:///shop.db"
+db_name="shop.db"
+
+SQLALCHEMY_DATABASE_URL="sqlite:///"+db_name
 
 engine= create_engine(SQLALCHEMY_DATABASE_URL,connect_args={'check_same_thread': False})
 

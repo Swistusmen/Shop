@@ -3,7 +3,6 @@ from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.requests import Request
 from DataAccessLayer import crud, models, schemas, database
 
-
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
@@ -23,11 +22,25 @@ from starlette.responses import Response
 import json
 
 from ClientOperations.client_operations import add_credits_to_the_wallet, realese_order
+import os
+
+files= os.listdir()
+isDatabaseEmpty=False
+if database.db_name not in files:
+    isDatabaseEmpty=True
 
 models.Base.metadata.create_all(bind=database.engine)
 
-app=FastAPI()
+if isDatabaseEmpty== False:
+    print("tworze")
+    user=schemas.UserCreate(email="root", password="password", name="name", surname="surname", is_admin=True, is_disabled=True, wallet=0)
+    user=hs.register_new_user(user)
+    db=database.SessionLocal()
+    crud.create_user(db=db, user=user)
+    crud.update_admin(db,1,True)
+    db.close()
 
+app=FastAPI()
 
 oauth2_scheme= OAuth2PasswordBearer(tokenUrl="token")
 
@@ -123,6 +136,15 @@ async def check_myself(db:Session=Depends(get_db), current_user: schemas.User=De
     if current_user is not None:
         return crud.get_user(db,current_user.id)
 
+@app.get("/account/me/change_password")
+async def change_password(password:str,db:Session=Depends(get_db), current_user: schemas.User=Depends(hs.get_current_user)):
+    if current_user is not None:
+        return crud.update_password(db,current_user.id, password)
+
+@app.get("/account/me/change_username")
+async def change_mail(username:str,db:Session=Depends(get_db), current_user: schemas.User=Depends(hs.get_current_user)):
+    if current_user is not None:
+        return crud.update_mail(db,current_user.id, username)
 
 @app.get("/account/orders/")
 async def get_all_orders(db:Session=Depends(get_db),current_user: schemas.User=Depends(hs.get_current_user)):
@@ -189,12 +211,12 @@ def create_product(product_id: int, price:float,db:Session=Depends(get_db),curre
 #- authenticate if it is admin DONE
 #- add product DONE
 #TODO- better locations of every endpoint #DONE
-#TODO- add pagination
+#TODO- add pagination DONE
 #- all products DONE
 #- a few products DONE
-#- available products
-#TODO- change username and password -1
-#TODO- add starting admin account
+#TODO available products
+#TODO- change username and password DONE
+#TODO- add starting admin account -1
 #TODO- add advisory basing on other purchases
 #TODO- story of purchases
 #- get stroy of purchases #DONE

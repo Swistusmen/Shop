@@ -101,6 +101,20 @@ def update_admin(db:Session, user_id: int, admin_priviliges:bool):
     db.refresh(user)
     return user
 
+def update_password(db:Session, user_id: int, password:str):
+    user=db.query(mUser).filter(mUser.id==user_id).first()
+    user.password= password
+    db.commit()
+    db.refresh(user)
+    return user
+
+def update_mail(db:Session, user_id: int, username:str):
+    user=db.query(mUser).filter(mUser.id==user_id).first()
+    user.email= username
+    db.commit()
+    db.refresh(user)
+    return user
+
 
 
 

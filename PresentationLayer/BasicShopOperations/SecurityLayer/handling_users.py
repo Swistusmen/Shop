@@ -30,7 +30,7 @@ def authenticate_user(database, username: str, password: str):
         return False
     return user
 
-async def get_current_user(db:Session=Depends(get_db), token: str = Depends(oauth2_scheme)):
+def get_current_user(db:Session=Depends(get_db), token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=401,
         detail="Could not validate credentials",
