@@ -31,6 +31,9 @@ def get_all_products(db:Session):
 def get_orders_by_user(db: Session, owner_id: int):
     return db.query(mOrder).filter(mOrder.user_id==owner_id).all()
 
+def get_orders(db: Session):
+    return db.query(mOrder).all()
+
 def get_basket(db:Session, user_id: int):
     orders=db.query(mOrder).filter(mOrder.user_id==user_id).all()
     for i in orders:

@@ -6,6 +6,7 @@ from DataAccessLayer import crud, models, schemas, database
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
+from Importer import export
 
 from SecurityLayer import handling_passwords as hp
 from SecurityLayer import handling_users as hs
@@ -31,8 +32,7 @@ if database.db_name not in files:
 
 models.Base.metadata.create_all(bind=database.engine)
 
-if isDatabaseEmpty== False:
-    print("tworze")
+if isDatabaseEmpty== True:
     user=schemas.UserCreate(email="root", password="password", name="name", surname="surname", is_admin=True, is_disabled=True, wallet=0)
     user=hs.register_new_user(user)
     db=database.SessionLocal()
@@ -58,6 +58,18 @@ def get_user(email: str, password: str, db: Session=Depends(get_db)):
 def create_user(user: schemas.UserCreate, db: Session= Depends(get_db)):
     user=hs.register_new_user(user)
     return crud.create_user(db=db, user=user)
+
+@app.get("/export/users")
+def test(db: Session= Depends(get_db)):
+    export.export_users(db)
+
+@app.get("/export/products")
+def test(db: Session= Depends(get_db)):
+    export.export_products(db)
+
+@app.get("/export/orders")
+def test(db: Session= Depends(get_db)):
+    export.export_orders(db)
 
 @app.get("/products/all/", response_model=List[schemas.Product])
 def get_all_products(db:Session= Depends(get_db)):
@@ -216,7 +228,7 @@ def create_product(product_id: int, price:float,db:Session=Depends(get_db),curre
 #- a few products DONE
 #TODO available products
 #TODO- change username and password DONE
-#TODO- add starting admin account -1
+#TODO- add starting admin account -DONE
 #TODO- add advisory basing on other purchases
 #TODO- story of purchases
 #- get stroy of purchases #DONE
