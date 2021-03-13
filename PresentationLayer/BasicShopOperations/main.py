@@ -6,7 +6,7 @@ from DataAccessLayer import crud, models, schemas, database
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
-from Importer import export
+from Importer import export, imports
 
 from SecurityLayer import handling_passwords as hp
 from SecurityLayer import handling_users as hs
@@ -33,12 +33,17 @@ if database.db_name not in files:
 models.Base.metadata.create_all(bind=database.engine)
 
 if isDatabaseEmpty== True:
-    user=schemas.UserCreate(email="root", password="password", name="name", surname="surname", is_admin=True, is_disabled=True, wallet=0)
-    user=hs.register_new_user(user)
-    db=database.SessionLocal()
-    crud.create_user(db=db, user=user)
-    crud.update_admin(db,1,True)
-    db.close()
+    dirs=os.listdir()
+    if "users.xlsx" in dirs:
+        db=database.SessionLocal()
+        imports.start_db_with_users(db)
+    else:
+        user=schemas.UserCreate(email="root", password="password", name="name", surname="surname", is_admin=True, is_disabled=True, wallet=0)
+        user=hs.register_new_user(user)
+        db=database.SessionLocal()
+        crud.create_user(db=db, user=user)
+        crud.update_admin(db,1,True)
+        db.close()
 
 app=FastAPI()
 
@@ -56,6 +61,7 @@ def get_user(email: str, password: str, db: Session=Depends(get_db)):
     
 @app.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session= Depends(get_db)):
+    user.is_admin=False
     user=hs.register_new_user(user)
     return crud.create_user(db=db, user=user)
 

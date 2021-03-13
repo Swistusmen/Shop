@@ -19,21 +19,23 @@ def export_users(db):
     ws= wb.active
     ws["A1"]="id"
     ws["B1"]="name" 
-    ws["C1"]="email" 
-    ws["D1"]="wallet" 
-    ws["E1"]="password" 
-    ws["F1"]="is_admin"  
-    ws["G1"]="is_disabled"     
+    ws["C1"]="surname"
+    ws["D1"]="email" 
+    ws["E1"]="wallet" 
+    ws["F1"]="password" 
+    ws["G1"]="is_admin"  
+    ws["H1"]="is_disabled"     
     list_of_users=crud.get_users(db)
     current_row=2
     for i in list_of_users:
         ws.cell(row=current_row, column=1, value=i.id)
         ws.cell(row=current_row, column=2, value=i.name)
-        ws.cell(row=current_row, column=3, value=i.email)
-        ws.cell(row=current_row, column=4, value=i.wallet)
-        ws.cell(row=current_row, column=5, value=i.password)
-        ws.cell(row=current_row, column=6, value=i.is_admin)
-        ws.cell(row=current_row, column=7, value=i.is_disabled)
+        ws.cell(row=current_row, column=3, value=i.surname)
+        ws.cell(row=current_row, column=4, value=i.email)
+        ws.cell(row=current_row, column=5, value=i.wallet)
+        ws.cell(row=current_row, column=6, value=i.password)
+        ws.cell(row=current_row, column=7, value=i.is_admin)
+        ws.cell(row=current_row, column=8, value=i.is_disabled)
         current_row+=1
     wb.save("users.xlsx")
 
