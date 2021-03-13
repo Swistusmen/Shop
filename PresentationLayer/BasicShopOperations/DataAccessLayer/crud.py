@@ -57,7 +57,7 @@ def create_product(db:Session, product: Product, shop_id: int):
     return db_product
 
 def create_order(db: Session, order: Order):
-    db_order= mOrder(user_id=order.owner_id, items=order.products, isFinished=order.isFinished)
+    db_order= mOrder(user_id=order.owner_id, items=order.products)
     db.add(db_order)
     db.commit()
     db.refresh(db_order)

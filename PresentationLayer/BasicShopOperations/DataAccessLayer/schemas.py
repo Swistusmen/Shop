@@ -16,7 +16,6 @@ class Product(ProductBase):
 
 class OrderBase(BaseModel):
     id: int
-    isFinished: bool
     products: str
 
 class Order(OrderBase):

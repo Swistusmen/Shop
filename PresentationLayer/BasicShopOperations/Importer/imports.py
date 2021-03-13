@@ -68,9 +68,8 @@ def start_db_with_orders(db):
     while ws.cell(row=current_row, column=1).value!=None:
         my_orders.append(schemas.Order(
             id=ws.cell(row=current_row, column=1).value,
-            isFinished=ws.cell(row=current_row, column=2).value,
-            products=ws.cell(row=current_row, column=3).value,
-            owner_id=ws.cell(row=current_row, column=4).value,
+            products=ws.cell(row=current_row, column=2).value,
+            owner_id=ws.cell(row=current_row, column=3).value,
             ))
         current_row+=1
 

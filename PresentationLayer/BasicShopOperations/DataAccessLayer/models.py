@@ -35,7 +35,6 @@ class Order(Base):
 
     id=Column(Integer, unique=True, primary_key=True)
 
-    isFinished=Column(Boolean, index=True)
     items=Column(String,index=True) #it is JSON product.id: number
 
     user_id= Column(Integer, ForeignKey("users.id"))

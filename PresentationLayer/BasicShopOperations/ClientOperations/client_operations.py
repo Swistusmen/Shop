@@ -33,7 +33,7 @@ def substract_credits_from_the_wallet(database, user_id:int, amount_of_money:flo
     return crud.update_wallet(database,user_id,new_value)
 
 def create_and_save_order(database, user_id:int, cookie:dict):
-    bucket=Order(isFinished=True, products=(str)(cookie),owner_id=user_id)
+    bucket=Order(products=(str)(cookie),owner_id=user_id,id=0)
     return crud.create_order(database,bucket)
     
 def decrease_number_of_product_in_shop(database, product_id: int, substract_this_number:int):
