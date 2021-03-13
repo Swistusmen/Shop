@@ -23,8 +23,7 @@ def export_users(db):
     ws["D1"]="email" 
     ws["E1"]="wallet" 
     ws["F1"]="password" 
-    ws["G1"]="is_admin"  
-    ws["H1"]="is_disabled"     
+    ws["G1"]="is_admin"    
     list_of_users=crud.get_users(db)
     current_row=2
     for i in list_of_users:
@@ -35,7 +34,6 @@ def export_users(db):
         ws.cell(row=current_row, column=5, value=i.wallet)
         ws.cell(row=current_row, column=6, value=i.password)
         ws.cell(row=current_row, column=7, value=i.is_admin)
-        ws.cell(row=current_row, column=8, value=i.is_disabled)
         current_row+=1
     wb.save("users.xlsx")
 

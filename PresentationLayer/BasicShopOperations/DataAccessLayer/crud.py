@@ -42,7 +42,7 @@ def get_basket(db:Session, user_id: int):
     return False
 
 def create_user(db: Session, user: UserCreate):
-    db_user=mUser(name=user.name, email=user.email, surname=user.surname, wallet=user.wallet,password=user.password, is_admin=user.is_admin,is_disabled=True)
+    db_user=mUser(name=user.name, email=user.email, surname=user.surname, wallet=user.wallet,password=user.password, is_admin=user.is_admin)
     print(db_user.password)
     db.add(db_user)
     db.commit()
@@ -81,15 +81,6 @@ def change_state_of_order(db: Session, order: mOrder, state: bool):
     db.add(order)
     db.commit()
     db.refresh(order)
-
-def switch_user_activity(db:Session, user_id:int):
-    user=db.query(mUser).filter(mUser.id==user_id).first()
-    db.query(mUser).filter(mUser.id==user_id).delete()
-    user.is_disabled= not user.is_disabled
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    return user
 
 def update_wallet(db:Session, user_id: int, new_wallet:float):
     user=db.query(mUser).filter(mUser.id==user_id).first()

@@ -26,8 +26,7 @@ def start_db_with_users(db):
             email=ws.cell(row=current_row, column=4).value,
             wallet=ws.cell(row=current_row, column=5).value,
             password=ws.cell(row=current_row, column=6).value,
-            is_admin=ws.cell(row=current_row, column=7).value,
-            is_disabled=ws.cell(row=current_row, column=8).value,
+            is_admin=ws.cell(row=current_row, column=7).value
             ))
         current_row+=1
 

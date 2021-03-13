@@ -13,7 +13,6 @@ class User(Base):
     wallet= Column(Float, index=True)
     password=Column(String,index=True)
     is_admin=Column(Boolean, index=True)
-    is_disabled=Column(Boolean, index=True)
 
     user= relationship("Product", back_populates="products")
     owner= relationship("Order", back_populates="orders")
