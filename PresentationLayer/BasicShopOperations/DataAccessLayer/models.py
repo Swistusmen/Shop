@@ -25,7 +25,7 @@ class Product(Base):
     description= Column(String, index=True)
     number=Column(Integer)
     price= Column(Float)
-
+    category= Column(String)
     user_id= Column(Integer, ForeignKey("users.id"))
 
     products= relationship("User", back_populates="user")

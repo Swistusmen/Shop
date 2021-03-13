@@ -47,9 +47,10 @@ def start_db_with_products(db):
             id=ws.cell(row=current_row, column=1).value,
             name=ws.cell(row=current_row, column=2).value,
             description=ws.cell(row=current_row, column=3).value,
-            number=ws.cell(row=current_row, column=4).value,
-            price=ws.cell(row=current_row, column=5).value,
-            user_id=ws.cell(row=current_row, column=6).value,
+            category=ws.cell(row=current_row, column=4).value,
+            number=ws.cell(row=current_row, column=5).value,
+            price=ws.cell(row=current_row, column=6).value,
+            user_id=ws.cell(row=current_row, column=7).value,
             ))
         current_row+=1
 

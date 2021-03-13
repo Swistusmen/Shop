@@ -45,19 +45,21 @@ def export_products(db):
     ws= wb.active
     ws["A1"]="id"
     ws["B1"]="name" 
-    ws["C1"]="description" 
-    ws["D1"]="number" 
-    ws["E1"]="price" 
-    ws["F1"]="user_id"     
+    ws["C1"]="description"
+    ws["D1"]="category" 
+    ws["E1"]="number" 
+    ws["F1"]="price" 
+    ws["G1"]="user_id"     
     list_of_users=crud.get_all_products(db)
     current_row=2
     for i in list_of_users:
         ws.cell(row=current_row, column=1, value=i.id)
         ws.cell(row=current_row, column=2, value=i.name)
         ws.cell(row=current_row, column=3, value=i.description)
-        ws.cell(row=current_row, column=4, value=i.number)
-        ws.cell(row=current_row, column=5, value=i.price)
-        ws.cell(row=current_row, column=6, value=i.user_id)
+        ws.cell(row=current_row, column=4, value="")
+        ws.cell(row=current_row, column=5, value=i.number)
+        ws.cell(row=current_row, column=6, value=i.price)
+        ws.cell(row=current_row, column=7, value=i.user_id)
         current_row+=1
     wb.save("products.xlsx")
 

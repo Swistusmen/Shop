@@ -6,6 +6,7 @@ class ProductBase(BaseModel):
     description: str
     number: int
     price: float
+    category: str
 
 class Product(ProductBase):
     id: int

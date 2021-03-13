@@ -50,7 +50,7 @@ def create_user(db: Session, user: UserCreate):
     return db_user
 
 def create_product(db:Session, product: Product, shop_id: int):
-    db_product=mProduct(name=product.name, description=product.description, number=product.number, price=product.price, user_id=1)
+    db_product=mProduct(name=product.name, description=product.description, number=product.number, price=product.price, user_id=1,category=product.category)
     db.add(db_product)
     db.commit()
     db.refresh(db_product)
