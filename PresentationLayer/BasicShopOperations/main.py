@@ -37,6 +37,12 @@ if isDatabaseEmpty== True:
     if "users.xlsx" in dirs:
         db=database.SessionLocal()
         imports.start_db_with_users(db)
+        if "orders.xlsx" in dirs:
+            db=database.SessionLocal()
+            imports.start_db_with_orders(db)
+        if "products.xlsx" in dirs:
+            db=database.SessionLocal()
+            imports.start_db_with_products(db)
     else:
         user=schemas.UserCreate(email="root", password="password", name="name", surname="surname", is_admin=True, is_disabled=True, wallet=0)
         user=hs.register_new_user(user)

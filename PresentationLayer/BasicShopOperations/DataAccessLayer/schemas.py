@@ -14,6 +14,7 @@ class Product(ProductBase):
         orm_mode= True
 
 class OrderBase(BaseModel):
+    id: int
     isFinished: bool
     products: str
 
