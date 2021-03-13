@@ -71,18 +71,6 @@ def create_user(user: schemas.UserCreate, db: Session= Depends(get_db)):
     user=hs.register_new_user(user)
     return crud.create_user(db=db, user=user)
 
-@app.get("/export/users")
-def test(db: Session= Depends(get_db)):
-    export.export_users(db)
-
-@app.get("/export/products")
-def test(db: Session= Depends(get_db)):
-    export.export_products(db)
-
-@app.get("/export/orders")
-def test(db: Session= Depends(get_db)):
-    export.export_orders(db)
-
 @app.get("/products/all/", response_model=List[schemas.Product])
 def get_all_products(db:Session= Depends(get_db)):
     return crud.get_all_products(db)
@@ -228,34 +216,27 @@ def create_product(product_id: int, price:float,db:Session=Depends(get_db),curre
             return None
         return crud.change_price_of_product(db, product,price)
 
-#TODO- add function which return current user after login -#DONE
-#TODO- create function for payment #DONE
-#TODO- admin module DONE
-#- change prive DONE
-#- change number of product DONE
-#- authenticate if it is admin DONE
-#- add product DONE
-#TODO- better locations of every endpoint #DONE
-#TODO- add pagination DONE
-#- all products DONE
-#- a few products DONE
-#TODO available products
-#TODO- change username and password DONE
-#TODO- add starting admin account -DONE
-#TODO- add advisory basing on other purchases
-#TODO- story of purchases
-#- get stroy of purchases #DONE
-#- parse it to the proper form #DONE
-#- process it
-#- add categories in database
-#TODO - import export- excel- database #DONE
-#TODO - tests
-# backend over
-#TODO- add frontend
+@app.get("/admin/export/users")
+def export_users(db: Session= Depends(get_db),current_user: schemas.UserCreate=Depends(hs.get_current_user)):
+    if current_user.is_admin==True:
+        export.export_users(db)
 
+@app.get("/admin/export/products")
+def export_products(db: Session= Depends(get_db),current_user: schemas.UserCreate=Depends(hs.get_current_user)):
+    if current_user.is_admin==True:
+        export.export_products(db)
 
-#TODO- change database
+@app.get("/admin/export/orders")
+def export_orders(db: Session= Depends(get_db),current_user: schemas.UserCreate=Depends(hs.get_current_user)):
+    if current_user.is_admin==True:
+        export.export_orders(db)
+
 #TODO- clean
+#TODO- add proper responses
+#TODO- add tests
+#TODO- add advisory basing on caegorie, others purchases
+
+#TODO- add front end
 
         
 
