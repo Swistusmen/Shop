@@ -43,6 +43,7 @@ def get_basket(db:Session, user_id: int):
 
 def create_user(db: Session, user: UserCreate):
     db_user=mUser(name=user.name, email=user.email, surname=user.surname, wallet=user.wallet,password=user.password, is_admin=user.is_admin,is_disabled=True)
+    print(db_user.password)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

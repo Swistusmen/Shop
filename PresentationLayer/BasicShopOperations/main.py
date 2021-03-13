@@ -101,7 +101,8 @@ def get_products(no_prod_on_site:int, page:int,db:Session= Depends(get_db)):
 @app.post("/token", response_model=hp.Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session=Depends(get_db)):
     user=crud.get_user_by_mail(db, form_data.username)
-
+    print("id usera: "+str(user.id))
+    print(user.password)
     if not user:
         return False
     if not hp.verify_hashed_password(user.password, form_data.password):
@@ -247,10 +248,14 @@ def create_product(product_id: int, price:float,db:Session=Depends(get_db),curre
 #- parse it to the proper form #DONE
 #- process it
 #- add categories in database
-#TODO - import export- excel- database
+#TODO - import export- excel- database #DONE
 #TODO - tests
 # backend over
 #TODO- add frontend
+
+
+#TODO- change database
+#TODO- clean
 
         
 

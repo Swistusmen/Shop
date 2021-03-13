@@ -10,7 +10,7 @@ SECRET_KEY="df9f9a50d72c72b24bc8fd5af24fb70d0ad090c84070b9410ae32eb3fb75b285"
 ALGORITHM="HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES= 15 
 
-pwd_context=CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context=CryptContext(schemes=["bcrypt"],deprecated="auto")
 
 class Token(BaseModel):
     token_type: str
@@ -22,11 +22,8 @@ class TokenData(BaseModel):
 def hash_password(password):
     return pwd_context.hash(password)
 
-#there is need to fix it
-async def verify_hashed_password(password, hashed_password):
-    print(password)
-    print(hashed_password)
-    return pwd_context.verify(password, hashed_password)
+def verify_hashed_password(password, hashed_password):
+    return pwd_context.verify( hashed_password,password)
 
 def create_access_token(data:dict, expires_delta: Optional[timedelta]= None):
     to_encode= data.copy()
